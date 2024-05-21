@@ -50,7 +50,7 @@ ssh-keygen
 
 拷贝密钥到每台机器上，脚本如下：
 ```bash
-cat << EOF > ssh_copy_id.sh
+cat << 'EOF' > ssh_copy_id.sh
 #!/bin/bash
 
 USER="debian"
@@ -90,7 +90,7 @@ chmod +x ssh_copy_id.sh
 
 程序如下：
 ```bash
-cat << EOF > hello.c
+cat << 'EOF' > hello.c
 #include <mpi.h>
 #include <stdio.h>
 
@@ -166,7 +166,7 @@ make arch=linux
 
 添加 known_hosts，脚本如下：
 ```bash
-cat << EOF > add_known.sh
+cat << 'EOF' > add_known.sh
 #!/bin/bash
 
 USER="debian"
@@ -199,7 +199,7 @@ chmod +x add_known.sh
 
 生成 machine file，脚本如下：
 ```bash
-cat << EOF > gen_machine.sh
+cat << 'EOF' > gen_machine.sh
 #!/bin/bash
 
 DOMAINS_FILE="all_hosts"

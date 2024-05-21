@@ -34,7 +34,7 @@ ruyi install gnu-plct-xthead gnu-upstream gnu-plct
 配置 ``.bashrc``：
 
 ```bash
-cat << EOF >> ~/.bashrc
+cat << 'EOF' >> ~/.bashrc
 [ -e ruyi-lp4a-venv ] && ruyi venv -t gnu-plct-xthead sipeed-lpi4a ruyi-lp4a-venv
 . ruyi-lp4a-venv/bin/ruyi-activate
 
