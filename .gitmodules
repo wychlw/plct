@@ -1,0 +1,3 @@
+[submodule "misc/report-i18n"]
+	path = misc/report-i18n
+	url = https://github.com/wychlw/report-i18n
