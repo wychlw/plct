@@ -18,6 +18,7 @@
 \title{操作系统支持矩阵国际化与自动翻译应用}
 \subtitle{基于 GPT 模型的自动国际化生成}
 \institute{测试小队}
+\author{孙齐}
 \date{2024 年 7 月 3 日}
 \usepackage{Beamer}
 
@@ -43,7 +44,6 @@
 
 \begin{document}
 
-\kaishu
 \begin{frame}
     \titlepage
 \end{frame}
@@ -52,12 +52,15 @@
     \tableofcontents[sectionstyle=show,subsectionstyle=show/shaded/hide,subsubsectionstyle=show/shaded/hide]
 \end{frame}
 
-\section{About}
+\section{Self}
 
-\begin{frame}{About}
+\begin{frame}{Self}
     \begin{itemize}
-        \item Github: \href[\@ wychlw]{github.com/wychlw}
+        \item Github: \href{\#wychlw}{github.com/wychlw}
         \newline
+        \item Email: lingwang\#wcysite.com
+        \newline
+        \item Refer as 泠/凛 in most cases
     \end{itemize}
 \end{frame}
 
@@ -101,10 +104,75 @@
     \begin{itemize}
         \item 50 development boards now with approximately 3-4 operating system each \newline
         actually: 219 reports in total
-        \item Huge amount of file to be translated: adding a new language is a huge workload without considering the human mistakes
-        \item Have some kind of similarity between the reports, but also lots of variations
+        \item Huge amount of file to be translated, need to consider human mistakes
+        \item Have some kind of similarity between the reports, but lots of variations
         \item With technical terms and context
     \end{itemize}
+\end{frame}
+
+\section{How to: Use GPT}
+
+\begin{frame}{Use GPT API}
+    \begin{itemize}
+        \item Basically just like in the web (no finetuning)
+        \item docs: \url{platform.openai.com/docs/overview}
+        \item Lots of usage: embedding, vision tts etc.
+        \newline Only consider text generation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Roles}
+    Three roles when talk with GPT:
+    \begin{itemize}
+        \item System: Model Instructions
+        \item Assisstant: Model Output
+        \item User: Conversation Input
+    \end{itemize}
+    System seems having more priority. \\
+    Context is important in translation, seperate Assisstant and User having some benefits. \\
+    \bigskip
+    (Though in other task, impact on different roles may be vary)
+\end{frame}
+
+\begin{frame}{Parameters}
+    Model have some parameters:
+    \begin{itemize}
+        \item temperature : ramdomness
+        \item max\_token : max context length(4095 in 3.5 and 4o)
+        \item top\_p : creativity (sometimes opposite to accuracy)
+        \item frequency\_penalty : no repeat(generally no need to set)
+        \item presence\_penalty : no same token(generally no need to set)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Usage}
+    RESTful API: Construct a JSON and send (or use predefined SDK)
+    \begin{minted}[
+        linenos
+    ]{python3}
+from openai import OpenAI
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[],
+    temperature=1,
+    max_tokens=256,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0
+)
+    \end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Usage}
+    Results are in JSON format, content in: \\
+    \mintinline{python3}| response.choices[0].message.content |
+
+    If out of token, \\
+    \mintinline{python3}| response.choices[0].finish_reason |
+    will be \mintinline{python3}| "length" |
+    (continue with no new things add to message)
 \end{frame}
 
 \section{report-i18n}
@@ -191,6 +259,23 @@
 \begin{frame}{Demo: report-i18n}
     Let's now try translating a report to French? \\
     (Hopefully the network is good enough)
+\end{frame}
+
+\section{Chat Any where}
+
+\begin{frame}{Chat Any where}
+    \begin{itemize}
+        \item \url{github.com/chatanywhere/GPT_API_free}
+        \item Provide free API for GPT-3.5 
+        \item Simply authorize it using github account to get a free key
+        \item Set the API\_URL in env.py to \mintinline{text}| https://api.chatanywhere.tech/v1 |
+    \end{itemize}
+    \begin{figure}
+        \centering
+            \includegraphics[width=\textwidth]{pic/get_free.png}
+        \centering
+            \includegraphics[width=\textwidth]{pic/free_api.png}
+    \end{figure}
 \end{frame}
 
 \begin{frame}
