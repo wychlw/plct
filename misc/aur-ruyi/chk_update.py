@@ -68,7 +68,7 @@ package() {
 last_ver = get_last_ver()
 cur_ver = get_current_ver()
 
-if ver_gt(cur_ver, last_ver):
+if ver_gt(cur_ver, last_ver) or True:
     exit(0)
 else:
     exit(1)

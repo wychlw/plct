@@ -3,10 +3,12 @@ name: 'aur ruyi update'
 on:
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
+    
 
 jobs:
   check_has_update:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     container:
       image: archlinux:latest
     steps:
@@ -26,7 +28,7 @@ jobs:
     env:
       SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     container:
       image: archlinux:latest
     steps:
@@ -67,4 +69,4 @@ jobs:
           git commit -m "Bump version"
       - name: Push to AUR
         run: |
-          git push origin master
+          # git push origin master
