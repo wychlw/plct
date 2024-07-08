@@ -1,8 +1,8 @@
-# Python for Milk-V Mars
+# Python for VisionFive2
 
 ## 简介
 
-Milk-V Mars 采用了 jh7110 系列芯片，且 GPIO 与 VisionFive2 兼容。
+VisionFive2 采用了 jh7110 系列芯片，且 GPIO 与 VisionFive2 兼容。
 
 StarFive 官方仿照树莓派的`RPi.GPIO`，为该芯片组移植了`VisionFive.gpio`。通过改变`import`，可以实现用 Python 操控如 UART、IIC 等硬件，并可使用大部分树莓派的 Python 项目。
 
@@ -10,13 +10,15 @@ StarFive 官方仿照树莓派的`RPi.GPIO`，为该芯片组移植了`VisionFiv
 
 ### 安装操作系统
 
-从 Github 获取官方 Debian 镜像：https://github.com/milkv-mars/mars-buildroot-sdk/releases/download/V1.0.6/mars_debian-desktop_sdk-v3.6.1_sdcard_v1.0.6.img.zip
+获取官方 Debian 镜像：https://debian.starfivetech.com/
 
 刷写到 sd 卡以安装系统：
 ```bash
-unzip mars_debian-desktop_sdk-v3.6.1_sdcard_v1.0.6.img.zip
-sudo dd if=mars_debian-desktop_sdk-v3.6.1_sdcard_v1.0.6.img of=/dev/sdc bs=1M status=progress
+sudo dd if=path/to/debian.img of=/dev/sdc bs=1M status=progress
 ```
+
+用户名：`user`
+密码：`starfive`
 
 ### 扩展分区
 
@@ -65,22 +67,49 @@ pip install VisionFive.gpio-1.3.2-cp310-cp310-riscv64.whl
 
 ## Demo
 
-### GPIO (Blink)
+请注意由于需要操作外设，以下 Demo 都需要 root 权限或自行设置 udev 权限。
 
-板子上的 led 接到了 pin 22 上。
+### GPIO
+
+将 Pin 22 与 Pin 18 相连，Pin 22 输出，Pin 18 读取电平：
 
 ```python
 import VisionFive.gpio as GPIO
 import time
 
-led_pin = 22
-GPIO.setup(led_pin, GPIO.OUT)
+out_pin = 22
+in_pin = 18
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(out_pin, GPIO.OUT)
+GPIO.setup(in_pin, GPIO.IN)
 
 while True:
-    GPIO.output(led_pin, GPIO.HIGH)
-    time.sleep(1)
-    GPIO.output(led_pin, GPIO.LOW)
-    time.sleep(1)
+    GPIO.output(out_pin, GPIO.HIGH)
+    time.sleep(0.5)
+    print(GPIO.input(in_pin))
+    time.sleep(0.5)
+    GPIO.output(out_pin, GPIO.LOW)
+    time.sleep(0.5)
+    print(GPIO.input(in_pin))
+    time.sleep(0.5)
+```
+
+预期输出：
+```log
+user@starfive:~$ sudo python3 ./test.py 
+[sudo] password for user: 
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
 ```
 
 ### I2C
@@ -91,23 +120,37 @@ while True:
 | --------- | --------- |
 | 19        | 20        |
 
+由于 VisionFive.gpio 库不提供 slave 模式，我们可以尝试读取内部连接到该 i2c 总线上的设备，总线为 i2c-5，地址为 0x50，寄存器为 0x2a~0x40：
+
 ```python
 import VisionFive.i2c as I2C
 import time
 
-addr=0x20
+addr=0x50
 
 dev="/dev/i2c-5"
 
 I2C.open(dev, addr)
 
-while True:
+for i in range(0x2a, 0x41):
+    I2C.write([i])
     data = I2C.read(1)
-    print(data)
+    print(chr(data[0]), end='')
+print()
 
 ```
 
+预期输出：
+```log
+StarFive Technology Co.
+```
+
 ### UART
+
+使用 UART 功能需要安装 pyserial 模块：
+```bash
+sudo pip install pyserial
+```
 
 | TX  | RX  |
 | --- | --- |
@@ -125,10 +168,30 @@ i=0
 while True:
     s = f"Hello! {i}\n"
     sr.write(s.encode())
+    sr.flush()
+    time.sleep(1)
     i+=1
 ```
 
+直接电脑上使用 TTL2USB 打开该串口即可。
+
+预期输出：
+```log
+Hello! 0
+                         Hello! 1
+                                 Hello! 2
+                                         Hello! 3
+                                                 Hello! 4
+                                                         Hello! 5
+                                                                 Hello! 6
+                                                                         Hello! 7
+                                                                                 Hello! 8
+                                                                                         Hello! 9
+```
+
 ### PWM
+
+在 pin22 上接一个 LED，能看到其亮度变化：
 
 ```python
 import VisionFive.gpio as GPIO
@@ -158,11 +221,12 @@ SPI 采用还回方式测试：
 
 | MOSI | MISO | SCLK |
 | ---- | ---- | ---- |
-| 52   | 53   | 23   |
+| 19   | 21   | 23   |
 
 ```python
+
 import VisionFive.spi as SPI
-import VisionFive.gpio as GPIO
+import time
 
 dev="/dev/spidev1.0"
 
@@ -171,11 +235,11 @@ SPI.setmode(600000, 0, 8)
 
 i=0
 while True:
-    s=f"Hello {i}".encode()
-    spi.write(s)
-    recv = spi.read()
+    s=f"Hello {i}"
+    arr=[ord(ch) for ch in s]
+    SPI.write(arr)
+    recv = SPI.read(len(s))
+    print(recv)
+    time.sleep(0.5)
 
-    print(recv.decode())
-
-    sleep(1)
 ```

@@ -1,11 +1,12 @@
-# Satrdew Valley on Milk-v Mars
+# Satrdew Valley on VisionFive2
 
 ## 简介
 
-通过使用 GLES 和 Box64，我们能在 Milk-v Mars 上玩星露谷物语了！
+通过使用 GLES 和 Box64，我们能在 VisionFive2 上玩星露谷物语。
+
 ## 硬件准备
 
-- 一块 Milk-v Mars 开发板及电源线
+- 一块 VisionFive2 开发板及电源线
 - HDMI 显示器和连接线（用于展示图形界面）
 - 键鼠
 - SD 卡
@@ -22,7 +23,8 @@ gl4es 被用于提供 opengl 图形 API：
 git clone https://github.com/ptitSeb/gl4es
 cd gl4es
 mkdir build; cd build; cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo;
-make
+make -j4
+sudo make install
 ```
 
 ### box64
