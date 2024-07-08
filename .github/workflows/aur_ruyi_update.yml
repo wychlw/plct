@@ -15,7 +15,7 @@ jobs:
       - name: Create env
         run: |
           pacman -Sy --noconfirm openssl git python python-pip python-beautifulsoup4 python-requests
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Check has update
         run: |
           python misc/aur-ruyi/chk_update.py
@@ -28,6 +28,7 @@ jobs:
     env:
       SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.AUR_KNOWN_HOSTS }}
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
@@ -45,10 +46,12 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          ssh-add ~/.ssh/id_rsa
           git config --global user.email "lingwang@wcysite.com"
           git config --global user.name "Ling Wang"
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Gen PKGBUILD
         run: |
           python misc/aur-ruyi/update.py
@@ -58,7 +61,7 @@ jobs:
           cd ruyi-bin
           git init
           git remote add origin ssh://aur@aur.archlinux.org/ruyi-bin.git
-          git pull origin master
+          git pull origin master 
 
           cp ../PKGBUILD .
           updpkgsums
