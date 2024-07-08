@@ -1,0 +1,70 @@
+name: 'aur ruyi update'
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  check_has_update:
+    runs-on: debian-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Create env
+        run: |
+          pacman -Sy --noconfirm openssl git python python-pip python-beautifulsoup4 python-requests
+      - uses: actions/checkout@v2
+      - name: Check has update
+        run: |
+          python misc/aur-ruyi/chk_update.py
+          has_update=$?
+          echo "has_update=$has_update" >> $GITHUB_ENV
+
+  update_version:
+    needs: [check_has_update]
+    if: ${{ needs.check_has_update.outputs.has_update == 0 }}
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+      SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
+    runs-on: debian-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Update env
+        run: |
+          pacman -Sy --noconfirm fastfetch
+          fastfetch
+      - name: Create build env
+        run: |
+          pacman -Sy --noconfirm base-devel wget openssl openssh git python python-pip python-beautifulsoup4 python-requests
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan aur.archlinux.org >> ~/.ssh/known_hosts
+          git config --global user.email "lingwang@wcysite.com"
+          git config --global user.name "Ling Wang"
+      - uses: actions/checkout@v2
+      - name: Gen PKGBUILD
+        run: |
+          python misc/aur-ruyi/update.py
+      - name: Maintain package
+        run: |
+          mkdir -p ruyi-bin
+          cd ruyi-bin
+          git init
+          git remote add origin ssh://aur@aur.archlinux.org/ruyi-bin.git
+          git pull origin master
+
+          cp ../PKGBUILD .
+          updpkgsums
+          makepkg --printsrcinfo > .SRCINFO
+          rm ruyi.*
+
+          git add PKGBUILD .SRCINFO
+          git commit -m "Bump version"
+      - name: Push to AUR
+        run: |
+          git push origin master
