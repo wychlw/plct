@@ -15,7 +15,7 @@ jobs:
       - name: Create env
         run: |
           pacman -Sy --noconfirm openssl git python python-pip python-beautifulsoup4 python-requests
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Check has update
         run: |
           python misc/aur-ruyi/chk_update.py
@@ -28,7 +28,6 @@ jobs:
     env:
       SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
-      SSH_KNOWN_HOSTS: ${{ secrets.AUR_KNOWN_HOSTS }}
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
@@ -39,19 +38,24 @@ jobs:
           fastfetch
       - name: Create build env
         run: |
-          pacman -Sy --noconfirm base-devel wget openssl openssh git python python-pip python-beautifulsoup4 python-requests
+          pacman -Sy --noconfirm base-devel pacman-contrib wget openssl openssh git python python-pip python-beautifulsoup4 python-requests
       - name: Create SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          echo "$SSH_PUBLIC_KEY" > ~/.ssh/id_rsa.pub
-          chmod 600 ~/.ssh/id_rsa
-          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-          ssh-add ~/.ssh/id_rsa
+          echo "$SSH_PRIVATE_KEY" > /root/.ssh/aur
+          echo "$SSH_PUBLIC_KEY" > /root/.ssh/aur.pub
+          chmod 600 /root/.ssh/aur
+          chmod 600 /root/.ssh/aur.pub
+          ssh-keyscan aur.archlinux.org > /root/.ssh/known_hosts
+          chmod 600 /root/.ssh/known_hosts
+          cat <<EOF > /root/.ssh/config
+          Host aur.archlinux.org
+            IdentityFile /root/.ssh/aur
+            User aur
+          EOF
           git config --global user.email "lingwang@wcysite.com"
           git config --global user.name "Ling Wang"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Gen PKGBUILD
         run: |
           python misc/aur-ruyi/update.py
@@ -59,17 +63,23 @@ jobs:
         run: |
           mkdir -p ruyi-bin
           cd ruyi-bin
-          git init
+          git -c init.defaultBranch=master init
           git remote add origin ssh://aur@aur.archlinux.org/ruyi-bin.git
-          git pull origin master 
+          git pull origin master
 
           cp ../PKGBUILD .
-          updpkgsums
-          makepkg --printsrcinfo > .SRCINFO
-          rm ruyi.*
+          useradd -m build
+          chown -R build:build .
+          su build -c "updpkgsums"
+          su build -c "makepkg --printsrcinfo > .SRCINFO"
+          rm ruyi*
 
+          git config --global --add safe.directory $(pwd)
           git add PKGBUILD .SRCINFO
           git commit -m "Bump version"
+          echo "Updated PKGBUILD:"
+          cat PKGBUILD
       - name: Push to AUR
         run: |
-          # git push origin master
+          cd ruyi-bin
+          git push origin master

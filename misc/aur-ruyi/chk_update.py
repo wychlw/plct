@@ -38,35 +38,10 @@ def get_current_ver():
     sort_ver(ver_list)
     return ver_list[-1]
 
-def gen_pkgbuild(ver: str):
-    pkgbuild = """
-# Maintainer: Ling Wang <lingwang@wcysite.com>
-pkgname=ruyi-bin
-pkgver=[pkgver_placeholder]
-pkgrel=1
-pkgdesc="The package manager for RuyiSDK."
-arch=("x86_64" "arm64" "riscv64")
-url="https://github.com/ruyisdk/ruyi"
-license=('Apache-2.0')
-depends=('wget' 'git' 'tar' 'bzip2' 'xz' 'zstd')
-provides=('ruyi=$pkgver')
-options=('!strip') # !important, otherwise the binary will be broken
-source_x86_64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
-source_arm64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
-source_riscv64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.riscv64")
-
-package() {
-    install -d "${pkgdir}/usr/bin"
-    install -m755 "${srcdir}/ruyi-$pkgver-bin" "${pkgdir}/usr/bin/ruyi"
-}
-"""
-    pkgbuild.replace('[pkgver_placeholder]', ver)
-
-    with open('PKGBUILD', 'w') as f:
-        f.write(pkgbuild)
-
 last_ver = get_last_ver()
 cur_ver = get_current_ver()
+
+print(f"Last version: {last_ver}, Current version: {cur_ver}")
 
 if ver_gt(cur_ver, last_ver) or True:
     exit(0)

@@ -51,16 +51,16 @@ license=('Apache-2.0')
 depends=('wget' 'git' 'tar' 'bzip2' 'xz' 'zstd')
 provides=('ruyi=$pkgver')
 options=('!strip') # !important, otherwise the binary will be broken
-source_x86_64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
-source_arm64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
-source_riscv64=("ruyi-$pkgver-bin::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.riscv64")
+source_x86_64=("ruyi-$pkgver-bin-x86_64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
+source_arm64=("ruyi-$pkgver-bin-arm64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
+source_riscv64=("ruyi-$pkgver-bin-riscv64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.riscv64")
 
 package() {
     install -d "${pkgdir}/usr/bin"
-    install -m755 "${srcdir}/ruyi-$pkgver-bin" "${pkgdir}/usr/bin/ruyi"
+    install -m755 "${srcdir}/ruyi-$pkgver-bin-$CARCH" "${pkgdir}/usr/bin/ruyi"
 }
 """
-    pkgbuild.replace('[pkgver_placeholder]', ver)
+    pkgbuild = pkgbuild.replace('[pkgver_placeholder]', ver)
 
     with open('PKGBUILD', 'w') as f:
         f.write(pkgbuild)
@@ -84,5 +84,7 @@ package() {
     # os.system('git push origin master')
 
 cur_ver = get_current_ver()
+
+print(f"Updating to version {cur_ver}...")
 
 gen_pkgbuild(cur_ver)
