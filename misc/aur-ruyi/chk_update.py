@@ -43,7 +43,7 @@ cur_ver = get_current_ver()
 
 print(f"Last version: {last_ver}, Current version: {cur_ver}")
 
-if ver_gt(cur_ver, last_ver) or True:
+if ver_gt(cur_ver, last_ver):
     exit(0)
 else:
     exit(1)
