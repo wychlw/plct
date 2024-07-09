@@ -4,27 +4,30 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
-    
 
 jobs:
   check_has_update:
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
+    outputs:
+      has_update: ${{ steps.chk_upd.outputs.has_update }}
     steps:
       - name: Create env
         run: |
           pacman -Sy --noconfirm openssl git python python-pip python-beautifulsoup4 python-requests
       - uses: actions/checkout@v4
       - name: Check has update
+        id: chk_upd
         run: |
           python misc/aur-ruyi/chk_update.py
-          has_update=$?
-          echo "has_update=$has_update" >> $GITHUB_ENV
+          has_update=$(cat chk.res)
+          echo "Has update: $has_update"
+          echo "has_update=$has_update" >> "$GITHUB_OUTPUT"
 
   update_version:
     needs: [check_has_update]
-    if: ${{ needs.check_has_update.outputs.has_update == 0 }}
+    if: ${{ needs.check_has_update.outputs.has_update == '0' }}
     env:
       SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
