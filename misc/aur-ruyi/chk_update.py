@@ -43,7 +43,8 @@ cur_ver = get_current_ver()
 
 print(f"Last version: {last_ver}, Current version: {cur_ver}")
 
-if ver_gt(cur_ver, last_ver):
-    exit(0)
-else:
-    exit(1)
+with open("chk.res", "w") as f:
+    if ver_gt(cur_ver, last_ver):
+        f.write("0")
+    else:
+        f.write("1")

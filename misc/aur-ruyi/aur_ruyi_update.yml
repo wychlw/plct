@@ -7,7 +7,6 @@ on:
     
 
 jobs:
-  # Fail on this job is expected, terminate the entire workflow if no update is found
   check_has_update:
     runs-on: ubuntu-latest
     container:
@@ -20,13 +19,12 @@ jobs:
       - name: Check has update
         run: |
           python misc/aur-ruyi/chk_update.py
-          has_update=$(cat chk.res)
-          echo "Has update: $has_update"
+          has_update=$?
           echo "has_update=$has_update" >> $GITHUB_ENV
 
   update_version:
     needs: [check_has_update]
-    if: ${{ needs.check_has_update.outputs.has_update == "0" }}
+    if: ${{ needs.check_has_update.outputs.has_update == 0 }}
     env:
       SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       SSH_PUBLIC_KEY: ${{ secrets.AUR_SSH_PUBLIC_KEY }}
@@ -84,4 +82,4 @@ jobs:
       - name: Push to AUR
         run: |
           cd ruyi-bin
-          # git push origin master
+          git push origin master
