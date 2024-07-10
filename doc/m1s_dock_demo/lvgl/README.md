@@ -110,7 +110,7 @@ cube/bflb_iot_tool-ubuntu --chipname=bl808 --port=/dev/ttyUSB1 --baudrate=200000
 
 
 运行结果：
-![Video](./assets/1.mp4)
+[Video](./assets/1.webm)
 
 ---
 
@@ -412,5 +412,5 @@ void main()
 #### 预期结果
 
 运行结果：
-![Video](./assets/4.mp4)
+[Video](./assets/4.webm)
 
