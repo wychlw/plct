@@ -69,7 +69,42 @@ pip install VisionFive.gpio-1.3.2-cp310-cp310-riscv64.whl
 
 请注意由于需要操作外设，以下 Demo 都需要 root 权限或自行设置 udev 权限。
 
-### GPIO
+### GPIO Basic
+
+Visionfive 2 的基本 GPIO 操作如下：
+- `GPIO.setmode(mode)`
+    - mode: 
+        - `GPIO.BOARD`：pin 编号按照 Visionfive 2 的板级定义给出（即 GPIO PIN 顺序）
+        - `GPIO.BCM`：pin 编号按照 JH7110 的芯片定义给出
+    - 需要在开始时初始化，一般建议 BOARD 模式
+    - **下文中所有 Demo，默认为 BOARD 模式**
+- `GPIO.setup(pin_num, mode, pull ?= GPIO.PUD_OFF, init ?= GPIO.LOW)`
+    - pin_num: GPIO pin num
+    - mode：输入/输出模式
+        - GPIO.IN：输入
+        - GPIO.OUT：输出
+    - pull：上拉/下拉/推挽输出
+        - GPIO.PUD_UP：上拉输入
+        - GPIO.PUD_DOWN：下拉输入
+        - GPIO.PUD_OFF：无上拉/下拉，推挽输出 **Visionfive 2 只支持推挽输出**
+    - init：初始值
+        - GPIO.HIGH：高输出
+        - GPIO.LOW：低输出
+    - 初始化某个 GPIO PIN
+- `GPIO.gpio_function(pin_num?)`
+    - pin_num：可选，GPIO 编号
+    - 输出某个 GPIO 支持的功能。若不填写编号则输出全部。
+- `GPIO.input(pin_num)`
+    - pin_num：GPIO 编号
+    - 读取某个 GPIO 的电平
+- `GPIO.output(pin_num, level)`
+    - pin_num：GPIO 编号
+    - level：电平
+        - GPIO.HIGH：高输出
+        - GPIO.LOW：低输出
+    - 设置某个 GPIO 的输出电平
+
+#### 环回测试
 
 将 Pin 22 与 Pin 18 相连，Pin 22 输出，Pin 18 读取电平：
 
@@ -111,6 +146,152 @@ user@starfive:~$ sudo python3 ./test.py
 1
 0
 ```
+
+也可见：[GPIO.cast](./GPIO.cast)
+
+#### Blink
+
+**请注意 LED 电平，否则会烧掉**
+
+使用 Pin 22 作为输出，控制 LED 亮灭：
+```python
+import VisionFive.gpio as GPIO
+import time
+
+led_pin = 22
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(led_pin, GPIO.OUT)
+
+while True:
+    GPIO.output(led_pin, GPIO.HIGH)
+    print(f"Pin: {led_pin}")
+    time.sleep(0.5)
+    GPIO.output(led_pin, GPIO.LOW)
+    print(f"pIN: {led_pin}")
+    time.sleep(0.5)
+```
+
+能看到 LED 闪烁。
+
+[Video](./assets/LED_BLINK.mp4)
+
+### GPIO Advanced
+
+接下来介绍与 GPIO 中断、回调有关的内容。
+
+- `GPIO.add_event_detect(pin_num, edge, callback?, bouncetime?)`
+    - pin_num：GPIO 编号
+    - edge：边沿
+        - GPIO.RISING：上升沿检测
+        - GPIO.FALLING：下降沿检测
+        - GPIO.BOTH：两者都
+    - callback：回调函数，可选
+        - 函数定义：`def func(pin_num, edge)`
+    - bouncetime：消抖时间（毫秒），可选
+    - 设置启用 GPIO 边沿中断
+- `GPIO.add_event_callback(pin_num, callback)`
+    - pin_num：GPIO 编号
+    - callback：回调函数，可选
+        - 函数定义：`def func(pin_num, edge)`
+    - 增加回调函数
+- `GPIO.detect(pin_num)`
+    - pin_num：GPIO 编号
+    - 自回调中断设置以来，是否被触发
+- `GPIO.get_detected_event(pin_num)`
+    - pin_num：GPIO 编号
+    - 被设置的中断边沿
+- `GPIO.remove_event_detect(pin_num)`
+    - pin_num：GPIO 编号
+    - 关闭中断，取消所有事件
+
+#### 按键控制
+
+采用按键控制 LED 的状态。
+Pin 22 作为 LED 的输出，Pin 18 作为按钮的输入：
+
+```python
+import VisionFive.gpio as GPIO
+import time
+
+out_pin = 22
+in_pin = 18
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(out_pin, GPIO.OUT)
+GPIO.setup(in_pin, GPIO.IN, GPIO.PUD_DOWN)
+
+led_state = 0
+
+def cb(*args, **kwargs):
+    global led_state
+    led_state = not led_state
+    GPIO.output(out_pin, led_state)
+    print(f"LED SWITCHED!")
+
+GPIO.add_event_detect(in_pin, GPIO.RISING, callback = cb, bouncetime = 50)
+
+while True:
+    if GPIO.event_detected(in_pin):
+        print("Detected Edge!!!")
+        print(f"Edge:{GPIO.get_detected_event(in_pin)}")
+    time.sleep(0.3)
+
+```
+
+### PWM
+
+Visionfive 2 的 PWM 模块如下：
+- `GPIO.PWM(PIN, freq)`
+    - PIN: GPIO PIN（见文档）; frep: > 1.0，周期长度（Hz）
+    - 定义引脚的 PWM 功能
+- `ChangeDutyCycle(duty_cycle)` / `ChangeDutyRatio(duty_cycle)` *alias*
+    - dupy_cycle: 0.0 - 100.0，占空比
+    - 更改 PWM 波形占空比
+- `ChangeFrequency(freq)` / `ChangeFreq(freq)` *alias*
+    - freq: > 1.0，周期长度（Hz）
+    - 更改 PWM 波形周期
+- `start(duty_cycle)`
+    - dupy_cycle: 0.0 - 100.0，占空比
+    - 启动 PWM 输出
+- `stop()`
+    - 关闭 PWM 输出
+
+#### PWM LED 亮度
+
+在 pin22 上接一个 LED，能看到其亮度变化：
+
+```python
+import VisionFive.gpio as GPIO
+import time
+
+led_pin = 22
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(led_pin, GPIO.OUT)
+pwm=GPIO.PWM(led_pin, 1000)
+pwm.start(0)
+
+while True:
+    pwm.ChangeDutyCycle(50)
+    for freq in range(5, 50, 5):
+        pwm.ChangeFrequency(freq)
+        print(f"Freq: {freq}Hz")
+        time.sleep(5 * (1 / freq))
+    pwm.ChangeFrequency(100)
+    for duty in range(0, 51, 5):
+        pwm.ChangeDutyCycle(duty)
+        print(f"Duty: {duty}%")
+        time.sleep(0.3)
+    time.sleep(0.5)
+    for duty in range(50, -1, -5):
+        pwm.ChangeDutyCycle(duty)
+        print(f"Duty: {duty}%")
+        time.sleep(0.3)
+    time.sleep(0.5)
+```
+
+第一阶段，LED 越闪越快；第二阶段，LED 先变亮后变暗。能在命令行中看到对应的参数变化。
+
+[Video](./assets/PWM_LED.mp4)
 
 ### I2C
 
@@ -189,35 +370,9 @@ Hello! 0
                                                                                          Hello! 9
 ```
 
-### PWM
-
-在 pin22 上接一个 LED，能看到其亮度变化：
-
-```python
-import VisionFive.gpio as GPIO
-import time
-
-led_pin = 22
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(led_pin, GPIO.OUT)
-pwm=GPIO.PWM(led_pin, 1000)
-pwm.start(0)
-
-while True:
-    for duty in range(0, 101):
-        pwm.ChangeDutyCycle(duty)
-        sleep(0.5)
-    sleep(1)
-    for duty in range(100, -1, -1):
-        pwm.ChangeDutyCycle(duty)
-        sleep(0.5)
-    sleep(1)
-```
-
 ### SPI
 
-SPI 采用还回方式测试：
+SPI 采用环回方式测试：
 
 | MOSI | MISO | SCLK |
 | ---- | ---- | ---- |
