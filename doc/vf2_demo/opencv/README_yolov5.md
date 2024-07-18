@@ -113,4 +113,4 @@ python3 ./yolov5.py --device {your-device}
 
 应能看到桌面上出现 opencv 的视频流，内含 YOLO-V5 模型的识别结果。
 
-<!-- *更详细的视频请等我各种东西到货* -->
+![Video](./videos/yolov5.mp4)

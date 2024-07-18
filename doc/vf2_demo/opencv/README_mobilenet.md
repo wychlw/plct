@@ -115,4 +115,4 @@ example_3rd_dnn_mobilenet --device={your-device}
 
 应能看到桌面上出现 opencv 的视频流，内含 MobileNet-SSD 模型的识别结果。
 
-<!-- *更详细的视频请等我各种东西到货* -->
+![Video](./videos/mobilenet.mp4)

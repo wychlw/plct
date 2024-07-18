@@ -4,9 +4,9 @@
 
 VisionFive2 拥有 OpenCV 的 GPU 支持，可以在上面运行使用 GPU 的各类机器学习模型。
 
-YOLO-V3 是一个可被用于各类物体检测的视觉 AI 模型，可以通过使用其 demo 体现如何在 VisionFive2 上使用 C++ 进行模型的开发和使用。
+YOLO-V3 是一个可被用于各类物体检测的视觉 AI 模型，可以通过使用其 demo 体现如何在 VisionFive2 上使用 Pytorch 进行模型的开发和使用。
 
-该 demo 可展示如何在开发板上如何使用 GPU 加速运行采用 C++ 编写的 AI 模型。
+该 demo 可展示如何在开发板上如何使用 GPU 加速运行采用 Pytorch 预训练的 AI 模型。
 
 ## 硬件准备
 
@@ -106,10 +106,7 @@ export PATH=$PATH:/opt/
 ```bash
 cp -r /usr/share/opencv4/yolo-v3
 cd ./yolo-v3
-example_dnn_object_detection --config=yolov3-tiny.cfg \
-        --model=yolov3-tiny.weights \
-        --classes=classes.txt \
---width=416 --height=416 --scale=0.00392 --rgb --target=1 --device={your-device}
+python3 ./yolov3.py --device {your-device}
 ```
 
 其中，your-device 为你的视频输入流编号，如 `4` 代表 `/dev/video4`
@@ -118,4 +115,4 @@ example_dnn_object_detection --config=yolov3-tiny.cfg \
 
 应能看到桌面上出现 opencv 的视频流，内含 YOLO-V3 模型的识别结果。
 
-<!-- *更详细的视频请等我各种东西到货* -->
+![Video](./videos/yolov3.mp4)
