@@ -1,0 +1,22 @@
+
+WORKLOAD RESULTS TABLE
+
+                                                 MultiCore SingleCore           
+Workload Name                                     (iter/s)   (iter/s)    Scaling
+----------------------------------------------- ---------- ---------- ----------
+cjpeg-rose7-preset                                   63.29      16.92       3.74
+core                                                  0.28       0.07       4.00
+linear_alg-mid-100x100-sp                            20.09       5.22       3.85
+loops-all-mid-10k-sp                                  0.87       0.23       3.78
+nnet_test                                             0.62       0.18       3.44
+parser-125k                                          19.90       4.93       4.04
+radix2-big-64k                                       88.34      24.76       3.57
+zip-test                                             29.85       7.04       4.24
+
+MARK RESULTS TABLE
+
+Mark Name                                        MultiCore SingleCore    Scaling
+----------------------------------------------- ---------- ---------- ----------
+cert_mark.pl: ERROR: Missing score for sha-test (single)
+cert_mark.pl: ERROR: Missing score for sha-test (best)
+cert_mark.pl: ERROR: Could not compute score for 'CoreMark-PRO'
