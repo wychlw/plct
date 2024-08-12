@@ -853,7 +853,6 @@ if __name__ == "__main__":
 ```
 
 预期结果（无卫星信号）：
-
 ```log
 *****The GGA info is as follows: *****
  msg_id: $GPGGA
@@ -869,4 +868,30 @@ if __name__ == "__main__":
  pos_indi: 0
  total_Satellite: 00
 
+```
+
+预期结果（有卫星信号）：
+```log
+*****The GGA info is as follows: *****
+ msg_id: $GPGGA
+ utc time: 025447.00 (format: hhmmss.sss)
+ latitude: 30 degree 33.29251 minute
+ latitude: 3033.29251 (format: dddmm.mmmmm)
+ NorS: N
+ longitude: 104 degree 3.45523 minute
+ longitude: 10403.45523 (format: dddmm.mmmmm)
+ EorW: E
+ pos_indi: 1
+ total_Satellite: 08
+
+*****The positioning type is 3D *****
+The Satellite ID of channel {} : {}
+                           ch1 : 14
+                           ch2 : 01
+                           ch3 : 03
+                           ch4 : 06
+                           ch5 : 30
+                           ch6 : 21
+                           ch7 : 19
+                           ch8 : 17
 ```
