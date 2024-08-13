@@ -169,7 +169,7 @@ CoreMark 1.0 : 5044.251846 / GCC12.2.0 -O2 -march=rv64gc -DPERFORMANCE_RUN=1  -l
 
 原始结果详见：[带有 B 扩展](./with_b/)，[不带 B 扩展](./no_b/)
 
-可见，带有 B 扩展的测试得到了更高的分数，提升了约 **$21.97\%$**
+可见，带有 B 扩展的测试得到了更高的分数，提升了约 **$21.97%$**
 
 ### coremark-pro
 
@@ -218,7 +218,7 @@ make TARGET=linux64 CFLAGS='-march=rv64gc' XCMD='-c4 -v0' certify-all
 
 原始结果详见：[带有 B 扩展](./with_b/coremark-pro/)，[不带 B 扩展](./no_b/coremark-pro/)
 
-可以看到，B 扩展主要对特定应用，如 zip 压缩/解压中具有更大的效果。而在另外大部分只用到传统 rv64gc 指令集上的加速效果则不明显。对于有加速效果的应用场景下，其性能提升约在 **$5\%-10\%$** 之间。
+可以看到，B 扩展主要对特定应用，如 zip 压缩/解压中具有更大的效果。而在另外大部分只用到传统 rv64gc 指令集上的加速效果则不明显。对于有加速效果的应用场景下，其性能提升约在 **$5%-10%$** 之间。
 
 ### UnixBench-Double-Precision WhetstoVV
 
@@ -305,7 +305,7 @@ System Benchmarks Index Score (Partial Only)                          355.5
 
 ## 测试结论
 
-Visionfive2 具有的 CPU 核 U74-mc 实现了 B 扩展中的 zba zbb 两个子集。综合来看，B 扩展在特定能用到该扩展的任务上有着 10% 左右的性能提升。
+Visionfive2 具有的 CPU 核 U74-mc 实现了 B 扩展中的 zba zbb 两个子集。对于coremark跑分而言其有着比较大的提升，但从更实际的应用角度综合来看，B 扩展在特定能用到该扩展的任务上有着 5% -10% 左右的性能提升。
 
 ---
 
