@@ -94,8 +94,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
                   '', 0, 0, svg_width, svg_height)
 
     svg = SvgNode(
-        f'<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="svg-chart" font-family="{
-            conf.font_family}" height="{svg_height}" width="{svg_width}" style="font-size: {conf.font_size}pt;">',
+        f'<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" id="svg-chart" font-family="{conf.font_family}" height="{svg_height}" width="{svg_width}" style="font-size: {conf.font_size}pt;">',
         '</svg>',
         0, 0, svg_width, svg_height
     )
@@ -105,8 +104,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
 
     # table background
     table_bg = SvgNode(
-        f'<rect id="table-bg" x="0" y="0" width="{svg_width}" height="{
-            svg_height}" style="fill: rgb(255, 255, 255);"/>',
+        f'<rect id="table-bg" x="0" y="0" width="{svg_width}" height="{svg_height}" style="fill: rgb(255, 255, 255);"/>',
         '', 0, 0, table_height, table_width
     )
     svg.add_child(table_bg)
@@ -116,8 +114,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
     table_head = SvgNode('<g>', '</g>')
     xpos = conf.stroke_width * 2
     head_bg = SvgNode(
-        f'<rect x="0" y="{ypos}" width="{table_width}" height="{
-            row_height}" style="fill: rgb(200,200,200);"/>',
+        f'<rect x="0" y="{ypos}" width="{table_width}" height="{row_height}" style="fill: rgb(200,200,200);"/>',
         '', 0, ypos, 0+table_width, ypos+row_height
     )
     table_head.add_child(head_bg)
@@ -127,8 +124,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
             ''
         )
         item = SvgNode(
-            f'<text x="{xpos + conf.padding_x}" y="{ypos +
-                                                    row_height / 2}" font-weight="bold" class="table-head" width="{row_width[idx]}">',
+            f'<text x="{xpos + conf.padding_x}" y="{ypos + row_height / 2}" font-weight="bold" class="table-head" width="{row_width[idx]}">',
             '</text>',
             xpos+conf.padding_x, ypos+conf.padding_y, xpos +
             row_width[idx], ypos + row_height
@@ -146,8 +142,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
 
         # upper line
         line = SvgNode(
-            f'<line x1="0" y1="{ypos}" x2="{table_width}" y2="{
-                ypos}" style="stroke:rgb(128,128,128);stroke-width:{conf.stroke_width}"/>',
+            f'<line x1="0" y1="{ypos}" x2="{table_width}" y2="{ypos}" style="stroke:rgb(128,128,128);stroke-width:{conf.stroke_width}"/>',
             '', 0, ypos, table_width, ypos+conf.stroke_width
         )
         svg.add_child(line)
@@ -158,19 +153,16 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
                 ''
             )
             text_node = SvgNode(
-                f'<text x="{xpos + conf.padding_x}" y="{ypos + row_height /
-                                                        2}" class="table-data" height="{row_height}" width="{row_width[idx]}">',
+                f'<text x="{xpos + conf.padding_x}" y="{ypos + row_height / 2}" class="table-data" height="{row_height}" width="{row_width[idx]}">',
                 '</text>', xpos+conf.padding_x, ypos+conf.padding_y, xpos +
                 row_width[idx], ypos + row_height
             )
             text_node.add_child(text)
             table_row.add_child(text_node)
             back_color = conf.color_gen_func(row_idx, idx, i)
-            back_color = f'rgb({back_color[0]},{
-                back_color[1]},{back_color[2]})'
+            back_color = f'rgb({back_color[0]},{back_color[1]},{back_color[2]})'
             text_bg = SvgNode(
-                f'<rect x="{xpos}" y="{ypos}" width="{row_width[idx]}" height="{
-                    row_height}" style="fill: {back_color};"/>',
+                f'<rect x="{xpos}" y="{ypos}" width="{row_width[idx]}" height="{row_height}" style="fill: {back_color};"/>',
                 '', xpos, ypos, xpos+row_width[idx], ypos+row_height
             )
             if conf.link_gen_func(row_idx, idx, i) is not None:
@@ -192,8 +184,7 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
     for idx in range(len(head) - 1):
         xpos += row_width[idx]
         line = SvgNode(
-            f'<line x1="{xpos}" y1="0" x2="{xpos}" y2="{
-                table_height}" style="stroke:rgb(128,128,128);stroke-width:{conf.stroke_width}"/>',
+            f'<line x1="{xpos}" y1="0" x2="{xpos}" y2="{table_height}" style="stroke:rgb(128,128,128);stroke-width:{conf.stroke_width}"/>',
             '', xpos, 0, xpos + conf.stroke_width, table_height
         )
         svg.add_child(line)
@@ -201,26 +192,22 @@ def gen_svg_table(conf: SvgConf, head: list[str], data: list[list[str]]) -> SvgN
 
     # table border
     border_top = SvgNode(
-        f'<line x1="0" y1="{conf.stroke_width}" x2="{
-            table_width}" y2="{conf.stroke_width}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
+        f'<line x1="0" y1="{conf.stroke_width}" x2="{table_width}" y2="{conf.stroke_width}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
         '', 0, 0, table_height, conf.stroke_width * 2
     )
     svg.add_child(border_top)
     border_bottom = SvgNode(
-        f'<line x1="0" y1="{table_height}" x2="{table_width}" y2="{
-            table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
+        f'<line x1="0" y1="{table_height}" x2="{table_width}" y2="{table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
         '', 0, table_height, table_width, table_height + conf.stroke_width * 2
     )
     svg.add_child(border_bottom)
     border_left = SvgNode(
-        f'<line x1="0" y1="0" x2="0" y2="{
-            table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
+        f'<line x1="0" y1="0" x2="0" y2="{table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
         '', 0, 0, conf.stroke_width*2, table_height
     )
     svg.add_child(border_left)
     border_right = SvgNode(
-        f'<line x1="{table_width}" y1="0" x2="{table_width}" y2="{
-            table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
+        f'<line x1="{table_width}" y1="0" x2="{table_width}" y2="{table_height}" style="stroke:rgb(0,0,0);stroke-width:{conf.stroke_width * 2}"/>',
         '', table_width, 0, table_width + conf.stroke_width * 2, table_height
     )
     svg.add_child(border_right)
