@@ -1,0 +1,212 @@
+---
+title: "Run DeepSeek R1 Distill Model on SG2042"
+author: 测试小队
+date: Feb 14, 2025
+output:
+  beamer_presentation:
+    toc: true
+    theme: "AnnArbor"
+    colortheme: "dolphin"
+    fonttheme: "structurebold"
+    keep_tex: true
+    latex_engine: xelatex
+header-includes: 
+  - \usepackage{fontspec}
+  - \setmainfont{Noto Serif CJK SC}
+  - \setsansfont{Noto Sans CJK SC}
+  - \setmonofont{Noto Sans Mono CJK SC}
+---
+
+# 简介
+
+## DeepSeek R1 Distill Model 概述
+
+- DeepSeek-R1 是由 DeepSeek 团队推出的一个推理模型， 其目前具有大模型上领先的性能。
+- 原始 DeepSeek-R1 的参数量为 671B， 其不是个人电脑或 工作站可以承受的。 通过对模型进行提炼， 可以将成果迁移到更小的模型上。
+- 目前的蒸馏模型分别基于 Qwen2.5 和 Llama3 两个模型进行， 并产生 1.5B 到 70B 之间参数量不等的小模型。
+- 同时，通过量化，将高精度的数据转换为低精度的数据， 可以进一步减小模型的体积和增加运行速度。
+- 本次使用了 Qwen2.5 1.5B 和 Llama3 8B 两个模型的 `Q2_K`, `Q4_K_M` 两种量化进行演示。
+
+## 运行环境
+
+- 本次示例采用了基于 SG2042 的 MilkV-Pioneer 服务器进行，配置如下：
+    - CPU: 64C riscv64 c910
+    - RAM: 128GB
+    - OS: RevyOS
+    - Compiler: Plct-Xthead Gnu Toolchain
+
+# 安装依赖
+
+## Xthead 工具链
+
+SG2042 上的 Vector 指令集为 XTheadVector （包含RVV0p7）。
+后续的编译工作需要使用 RVV0p7 指令集， 而大多数编译器仅具有对 RVV1p0 的支持。
+因此，需要下载转为该系列芯片打造的编译器。
+
+PLCT 提供了针对 Xthead 的工具链，可以使用 `ruyi` 工具下载，也可以手动下载。
+
+---
+
+手动下载命令如下：
+
+```bash
+wget https://mirror.iscas.ac.cn/ruyisdk/dist/\
+RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0\
+-HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu.tar.xz
+tar -xvf RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0\
+-HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu.tar.xz
+cd RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0\
+-HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu/bin
+
+export PATH=$(pwd):$PATH
+```
+后续再次使用需要将工具链重新加入 `PATH` 中。
+
+---
+
+注意事项：
+- PLCT Xthead 工具链使用的 `sysroot` 并非系统的根目录，而是工具链自带的。在安装库时需要注意路径。
+- 在使用时需要手动设置 `CC=riscv64-plctxthead-linux-gnu-gcc` 和 `riscv64-plctxthead-linux-gnu-gfortran`
+
+## 编译 OpenBLAS 后端
+
+目前 Llama.cpp 支持的后端中，只有 OpenBLAS 有 RVV0p7 的支持。因此，采用 OpenBLAS 作为 GGML 的后端。
+
+```bash
+git clone https://github.com/OpenMathLib/OpenBLAS
+cd OpenBLAS
+make HOSTCC=gcc TARGET=C910V CC=riscv64-plctxthead-linux-gnu-gcc \
+FC=riscv64-plctxthead-linux-gnu-gfortran
+sudo make install PREFIX=~/RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0\
+-HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu/\
+riscv64-plctxthead-linux-gnu/sysroot/usr
+```
+
+务必注意 `PREFIX` 的路径，需要指向工具链的 `sysroot`。
+
+# 安装 Llama.cpp
+
+## 获取 Llama.cpp
+
+直接从 GitHub 上获取最新的 Llama.cpp 源码：
+
+```bash
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+```
+
+## Patch Llama.cpp
+
+由于 Llama.cpp 默认只考虑了 RVV1p0 的指令集，若直接编译，其会产生非法指令。需要手动讲起替换为 `v0p7`：
+```diff
+diff --git a/ggml/src/ggml-cpu/CMakeLists.txt b/ggml/src/ggml-cpu/CMakeLists.txt
+index 98fd18e..0e6f302 100644
+--- a/ggml/src/ggml-cpu/CMakeLists.txt
++++ b/ggml/src/ggml-cpu/CMakeLists.txt
+@@ -306,7 +306,7 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
+     elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "riscv64")
+         message(STATUS "RISC-V detected")
+         if (GGML_RVV)
+-            list(APPEND ARCH_FLAGS -march=rv64gcv -mabi=lp64d)
++            list(APPEND ARCH_FLAGS -march=rv64gcv0p7 -mabi=lp64d)
+         endif()
+     else()
+         message(STATUS "Unknown architecture")
+```
+
+## 编译 Llama.cpp
+
+指定 OpenBLAS 进行编译，注意设置 `CC` 和 `FC`：
+```bash
+CC=riscv64-plctxthead-linux-gnu-gcc FC=riscv64-plctxthead-linux-gnu-gfortran \
+cmake -B build -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS
+cmake --build build --config Release -j32
+```
+
+# 运行 DeepSeek R1 Distill Model
+
+## 下载模型
+
+在 Pioneer 上建议使用 8B 及以下的模型。如 [DeepSeek-R1-Distill-Llama-8B-GGUF](https://huggingface.co/unsloth/DeepSeek-R1-Distill-Llama-8B-GGUF) Q4_K_M 和 [DeepSeek-R1-Distill-Qwen-1.5B-GGUF](https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF) 这两个模型的 `Q4_K_M` 和 `Q2_K` 量化模型。
+
+---
+
+下载模型可以直接在网页端进行下载，也可以使用一个 Python 脚本进行下载。需要使用 `pip` 安装：
+```bash
+pip install huggingface_hub hf_transfer
+```
+
+```python
+import os
+
+from huggingface_hub import snapshot_download
+snapshot_download(
+  repo_id = "unsloth/DeepSeek-R1-Distill-Llama-8B-GGUF",
+  local_dir = "DeepSeek-R1-Distill-Llama-8B-GGUF",
+  allow_patterns = ["*Q4_K_M*", "*Q2_K*"],
+)
+```
+
+## 在 CLI 中运行
+
+下面的代码中，替换 `[your words]` 为你想要输入的文本。`-t` 选项代表线程数量，`-m` 代表模型路径。一般而言，选择 32 线程即可。
+
+```bash
+llama.cpp/build/bin/llama-cli \
+-m DeepSeek-R1-Distill-Llama-8B-GGUF/DeepSeek-R1-Distill-Llama-8B-Q4_K_M.gguf \
+--cache-type-k q8_0 -t 32 \
+--prompt '<｜User｜>[Your words]<｜Assistant｜>' \
+-no-cnv
+```
+
+---
+
+[![asciicast](hIX2a1zshOUyYMymv1Fadv7xv.pdf)](https://asciinema.org/a/hIX2a1zshOUyYMymv1Fadv7xv)
+
+## 交互式运行
+
+交互式运行时，llama.cpp 会提供一个 OpenAI API 兼容的网络接口，默认通过 `http://localhost:8080` 进行访问。
+
+`-t` 选项代表线程数量，`-m` 代表模型路径。一般而言，选择 32 线程即可。
+
+```bash
+llama.cpp/build/bin/llama-server \
+-m DeepSeek-R1-Distill-Llama-8B-GGUF/DeepSeek-R1-Distill-Llama-8B-Q4_K_M.gguf \
+--cache-type-k q8_0 -t 32
+```
+
+您可自行选择一个 HTTP 客户端进行访问，将 API Url 设置为 `http://localhost:8080/completion` 即可。
+
+或可采用一个使用 Python 编写的简单脚本进行访问，可在 [wychlw/plct/memo/deepseek_on_llama.cpp.md](https://github.com/wychlw/plct/blob/main/memo/deepseek_on_llama.cpp.md) 中找到。
+
+---
+
+[![asciicast](eRkibHqHPMO5v09G8pUKpNkDB.pdf)](https://asciinema.org/a/eRkibHqHPMO5v09G8pUKpNkDB)
+
+## 性能对比
+
+以下测试均采用了 32 线程的配置，在 Pioneer Box 上运行。
+
+DeepSeek R1 不同蒸馏模型及量化对比：
+
+| 模型                               | 量化   | ms per token | token per second |
+| ---------------------------------- | ------ | ------------ | ---------------- |
+| DeepSeek-R1-Distill-Qwen-1.5B-GGUF | Q2_K   | 785.58ms     | 1.27             |
+| DeepSeek-R1-Distill-Qwen-1.5B-GGUF | Q4_K_M | 992.34ms     | 1.01             |
+| DeepSeek-R1-Distill-Llama-8B-GGUF  | Q2_K   | 1884.06ms    | 0.53             |
+| DeepSeek-R1-Distill-Llama-8B-GGUF  | Q4_K_M | 1575.40ms    | 0.63             |
+
+在实际使用中发现，`Q2_K` 量化的模型思考过程反而较长，而 `Q4_K_M` 量化的模型思考过程较短。使得虽然 `Q2_K` 量化的模型速度更快，但 `Q4_K_M` 量化的模型感觉延迟更低。
+
+---
+
+问题均采用 `Hello! Who's there?` 作为输入。
+
+RTT 及 Token 数量对比：
+
+| 模型                               | 量化   | RTT (ms)  | Token 数量 |
+| ---------------------------------- | ------ | --------- | ---------- |
+| DeepSeek-R1-Distill-Qwen-1.5B-GGUF | Q2_K   | 231406.57 | 302        |
+| DeepSeek-R1-Distill-Qwen-1.5B-GGUF | Q4_K_M | 26217.45  | 26         |
+| DeepSeek-R1-Distill-Llama-8B-GGUF  | Q2_K   | 247836    | 136        |
+| DeepSeek-R1-Distill-Llama-8B-GGUF  | Q4_K_M | 75446.46  | 52         |
