@@ -8,7 +8,6 @@ output:
     theme: "AnnArbor"
     colortheme: "dolphin"
     fonttheme: "structurebold"
-    keep_tex: true
     latex_engine: xelatex
 header-includes: 
   - \usepackage{fontspec}
@@ -30,7 +29,7 @@ header-includes:
 ## 运行环境
 
 - 本次示例采用了基于 SG2042 的 MilkV-Pioneer 服务器进行，配置如下：
-    - CPU: 64C riscv64 c910
+    - CPU: 64C riscv64 c920
     - RAM: 128GB
     - OS: RevyOS
     - Compiler: Plct-Xthead Gnu Toolchain
@@ -77,6 +76,7 @@ git clone https://github.com/OpenMathLib/OpenBLAS
 cd OpenBLAS
 make HOSTCC=gcc TARGET=C910V CC=riscv64-plctxthead-linux-gnu-gcc \
 FC=riscv64-plctxthead-linux-gnu-gfortran
+sudo make install PREFIX=/usr
 sudo make install PREFIX=~/RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0\
 -HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu/\
 riscv64-plctxthead-linux-gnu/sysroot/usr
@@ -181,7 +181,7 @@ llama.cpp/build/bin/llama-server \
 
 ---
 
-[![asciicast](eRkibHqHPMO5v09G8pUKpNkDB.pdf)](https://asciinema.org/a/eRkibHqHPMO5v09G8pUKpNkDB)
+[![asciicast](z0Meshc1TuU6pT1Lpcjdm6mT7.pdf)](https://asciinema.org/a/z0Meshc1TuU6pT1Lpcjdm6mT7)
 
 ## 性能对比
 

@@ -27,6 +27,7 @@ cd ~
 git clone https://github.com/OpenMathLib/OpenBLAS
 cd OpenBLAS
 make HOSTCC=gcc TARGET=C910V CC=riscv64-plctxthead-linux-gnu-gcc FC=riscv64-plctxthead-linux-gnu-gfortran
+sudo make install PREFIX=/usr
 sudo make install PREFIX=~/RuyiSDK-20240222-T-Head-Sources-T-Head-2.8.0-HOST-riscv64-linux-gnu-riscv64-plctxthead-linux-gnu/riscv64-plctxthead-linux-gnu/sysroot/usr
 ```
 
@@ -131,6 +132,8 @@ llama.cpp/build/bin/llama-server -m DeepSeek-R1-Distill-Llama-8B-GGUF/DeepSeek-R
 ```bash
 import requests
 
+start_mask = ""
+system_mask = ""
 user_mask = "<｜User｜>"
 assistant_mask = "<｜Assistant｜>"
 
@@ -153,6 +156,8 @@ class Message:
             res += system_mask
         elif self.role == Message.USER:
             res += user_mask
+        elif self.role == Message.ASSISTANT:
+            res += assistant_mask
         res += self.text
         res += '\n'
         return res
@@ -162,8 +167,10 @@ class Conversation:
     message: list[Message]
     url: str
 
-    def __init__(self, url = "http://localhost:8080/completion"):
-        self.message = []
+    def __init__(self, system_promote = None, url = "http://127.0.0.1:8080/completion"):
+        self.message = [] if system_promote is None else [
+            Message(system_promote, Message.SYSTEM)
+        ]
         self.url = url
 
     def __post_chat__(self):
@@ -173,11 +180,12 @@ class Conversation:
         prompt += assistant_mask
         res = requests.post(self.url, json={"prompt": prompt})
         msg = res.json()
-        self.message.append(Message(msg["content"], Message.ASSISTANT))
+        self.message.append(Message(msg["content"], Message.SYSTEM))
         return msg["content"]
     
     def chat(self, text):
-        self.message.append(Message(text, Message.USER))
+        if len(text) > 0 :
+            self.message.append(Message(text, Message.USER))
         return self.__post_chat__()
     
 def main():
