@@ -1,0 +1,16 @@
+2K validation run parameters for coremark.
+CoreMark Size    : 666
+Total ticks      : 13592
+Total time (secs): 13.592000
+Iterations/Sec   : 4414.361389
+Iterations       : 60000
+Compiler version : Bianbu Clang 19.1.1 (1ubuntu1~24.04.2bb1)
+Compiler flags   : -O2 -march=rv64gc_zba_zbb_zbc_zbs -DPERFORMANCE_RUN=1  -lrt
+Memory location  : Please put data memory location here
+			(e.g. code in flash, data on heap etc)
+seedcrc          : 0x18f2
+[0]crclist       : 0xe3c1
+[0]crcmatrix     : 0x0747
+[0]crcstate      : 0x8d84
+[0]crcfinal      : 0x7155
+Correct operation validated. See README.md for run and reporting rules.

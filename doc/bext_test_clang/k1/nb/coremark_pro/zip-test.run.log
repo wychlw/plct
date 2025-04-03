@@ -1,0 +1,9 @@
+-  Info: Starting Run...
+-- Workload:zip-test=946108807
+-- zip-test:time(ns)=59
+-- zip-test:contexts=4
+-- zip-test:iterations=4
+-- zip-test:time(secs)=   0.059
+-- zip-test:secs/workload= 0.01475
+-- zip-test:workloads/sec= 67.7966
+-- Done:zip-test=946108807

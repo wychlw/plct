@@ -1,0 +1,10 @@
+WARNING: e_u32 type defined with more then 32 bits. Please define e_u32 such that it will be a 32b type in th_types.h to make sure all kernels execute correctly.-  Info: Starting Run...
+-- Workload:zip-test=946108807
+-- zip-test:time(ns)=134
+-- zip-test:ERRORS=4
+-- zip-test:contexts=4
+-- zip-test:iterations=4
+-- zip-test:time(secs)=   0.134
+-- zip-test:secs/workload=  0.0335
+-- zip-test:workloads/sec= 29.8507
+-- Done:zip-test=946108807
