@@ -23,24 +23,24 @@ coremark-pro:
 ```
 WORKLOAD RESULTS TABLE
 
-                                                 MultiCore SingleCore
+                                                 MultiCore SingleCore           
 Workload Name                                     (iter/s)   (iter/s)    Scaling
 ----------------------------------------------- ---------- ---------- ----------
-cjpeg-rose7-preset                                   46.51      12.00       3.88
+cjpeg-rose7-preset                                   46.08      11.95       3.86
 core                                                  0.29       0.07       4.14
-linear_alg-mid-100x100-sp                            22.99       5.96       3.86
-loops-all-mid-10k-sp                                  1.15       0.31       3.71
+linear_alg-mid-100x100-sp                            22.93       5.99       3.83
+loops-all-mid-10k-sp                                  1.14       0.31       3.68
 nnet_test                                             0.85       0.26       3.27
-parser-125k                                           9.57       4.44       2.16
-radix2-big-64k                                       75.37      25.75       2.93
-sha-test                                             64.10      19.27       3.33
-zip-test                                             30.08       8.00       3.76
+parser-125k                                          10.47       4.35       2.41
+radix2-big-64k                                       77.77      24.65       3.15
+sha-test                                             64.10      19.31       3.32
+zip-test                                             30.77       7.87       3.91
 
 MARK RESULTS TABLE
 
 Mark Name                                        MultiCore SingleCore    Scaling
 ----------------------------------------------- ---------- ---------- ----------
-CoreMark-PRO                                       1045.20     308.23       3.39
+CoreMark-PRO                                       1059.61     305.59       3.47
 ```
 
 csibe:

@@ -1,4 +1,4 @@
-iruapu:
+ruapu:
 ```
 i
 m

@@ -1,0 +1,77 @@
+From 026a4718707b254a203f0f49da4f8b606530d0e6 Mon Sep 17 00:00:00 2001
+From: Ling Wang <lingwang@wcysite.com>
+Date: Thu, 3 Apr 2025 22:21:26 +0800
+Subject: [PATCH] Modify to clang toolchain
+
+---
+ toolchain-files/riscv_gc.cmake                 | 14 ++++++++++++++
+ toolchain-files/riscv_gc_zba_zbb.cmake         | 14 ++++++++++++++
+ toolchain-files/riscv_gc_zba_zbb_zbc_zbs.cmake | 14 ++++++++++++++
+ 3 files changed, 42 insertions(+)
+ create mode 100644 toolchain-files/riscv_gc.cmake
+ create mode 100644 toolchain-files/riscv_gc_zba_zbb.cmake
+ create mode 100644 toolchain-files/riscv_gc_zba_zbb_zbc_zbs.cmake
+
+diff --git a/toolchain-files/riscv_gc.cmake b/toolchain-files/riscv_gc.cmake
+new file mode 100644
+index 0000000..6183edf
+--- /dev/null
++++ b/toolchain-files/riscv_gc.cmake
+@@ -0,0 +1,14 @@
++set(CMAKE_SYSTEM_NAME Generic)
++set(CMAKE_SYSTEM_PROCESSOR RISCV64)
++
++set(CMAKE_C_COMPILER_WORKS 1)
++set(CMAKE_CXX_COMPILER_WORKS 1)
++
++set(triple riscv64-unknown-elf)
++
++set(CMAKE_C_COMPILER clang)
++set(CMAKE_CXX_COMPILER clang++)
++
++set(RISCV_FLAGS "-march=rv64gc -mabi=lp64d  -Wno-implicit-function-declaration  -Wno-implicit-int -D__GLIBC_HAVE_LONG_LONG")
++set(CMAKE_C_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
++set(CMAKE_CXX_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
+diff --git a/toolchain-files/riscv_gc_zba_zbb.cmake b/toolchain-files/riscv_gc_zba_zbb.cmake
+new file mode 100644
+index 0000000..f58bba7
+--- /dev/null
++++ b/toolchain-files/riscv_gc_zba_zbb.cmake
+@@ -0,0 +1,14 @@
++set(CMAKE_SYSTEM_NAME Generic)
++set(CMAKE_SYSTEM_PROCESSOR RISCV64)
++
++set(CMAKE_C_COMPILER_WORKS 1)
++set(CMAKE_CXX_COMPILER_WORKS 1)
++
++set(triple riscv64-unknown-elf)
++
++set(CMAKE_C_COMPILER clang)
++set(CMAKE_CXX_COMPILER clang++)
++
++set(RISCV_FLAGS "-march=rv64gc_zba_zbb -mabi=lp64d  -Wno-implicit-function-declaration  -Wno-implicit-int -D__GLIBC_HAVE_LONG_LONG")
++set(CMAKE_C_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
++set(CMAKE_CXX_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
+diff --git a/toolchain-files/riscv_gc_zba_zbb_zbc_zbs.cmake b/toolchain-files/riscv_gc_zba_zbb_zbc_zbs.cmake
+new file mode 100644
+index 0000000..219b9e4
+--- /dev/null
++++ b/toolchain-files/riscv_gc_zba_zbb_zbc_zbs.cmake
+@@ -0,0 +1,14 @@
++set(CMAKE_SYSTEM_NAME Generic)
++set(CMAKE_SYSTEM_PROCESSOR RISCV64)
++
++set(CMAKE_C_COMPILER_WORKS 1)
++set(CMAKE_CXX_COMPILER_WORKS 1)
++
++set(triple riscv64-unknown-elf)
++
++set(CMAKE_C_COMPILER clang)
++set(CMAKE_CXX_COMPILER clang++)
++
++set(RISCV_FLAGS "-march=rv64gc_zba_zbb_zbc_zbs -mabi=lp64d  -Wno-implicit-function-declaration -Wno-implicit-int -D__GLIBC_HAVE_LONG_LONG")
++set(CMAKE_C_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
++set(CMAKE_CXX_FLAGS "${RISCV_FLAGS}" CACHE STRING "" FORCE)
+-- 
+2.49.0
+

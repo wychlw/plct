@@ -21,26 +21,27 @@ CoreMark 1.0 : 4252.604720 / Bianbu Clang 19.1.1 (1ubuntu1~24.04.2bb1) -O2 -marc
 
 coremark-pro:
 ```
-WORKLOAD RESULTS TABLE
+Mark Name                                        MultiCore SingleCore    Scaling
+----------------------------------------------- ---------- ---------- ----------
+CoreMark-PRO                                       1026.81     303.72       3.38
 
-                                                 MultiCore SingleCore
 Workload Name                                     (iter/s)   (iter/s)    Scaling
 ----------------------------------------------- ---------- ---------- ----------
-cjpeg-rose7-preset                                  151.52      39.06       3.88
-core                                                  0.97       0.25       3.88
-linear_alg-mid-100x100-sp                           102.67      26.84       3.83
-loops-all-mid-10k-sp                                  2.65       0.78       3.40
-nnet_test                                             3.95       1.18       3.35
-parser-125k                                          12.74       7.63       1.67
-radix2-big-64k                                      107.23      47.04       2.28
-sha-test                                            128.21      38.91       3.30
-zip-test                                             68.97      18.18       3.79
+cjpeg-rose7-preset                                   46.30      12.02       3.85
+core                                                  0.29       0.07       4.14
+linear_alg-mid-100x100-sp                            22.98       5.96       3.86
+loops-all-mid-10k-sp                                  1.15       0.30       3.83
+nnet_test                                             0.85       0.26       3.27
+parser-125k                                          10.00       4.48       2.23
+radix2-big-64k                                       73.65      25.73       2.86
+sha-test                                             64.10      19.27       3.33
+zip-test                                             30.30       8.00       3.79
 
 MARK RESULTS TABLE
 
 Mark Name                                        MultiCore SingleCore    Scaling
 ----------------------------------------------- ---------- ---------- ----------
-CoreMark-PRO                                       2663.13     843.55       3.16
+CoreMark-PRO                                       1047.89     307.45       3.41
 ```
 
 csibe:
