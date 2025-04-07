@@ -6,6 +6,7 @@
 
 - JH7100
 - K1
+- P550
 
 ### JH7110
 
@@ -135,3 +136,13 @@ CC=clang CXX=clang++ UB_GCC_OPTIONS="-march=rv64gc" ./Run
 | CSiBE (Total length, lower is better)                  | 3305763           | 3297953                   | -0.24%          |
 | Unix Bench Single Core (Index Score, higher is better) | 284.5             | 284.0                     | -0.18%          |
 | Unix Bench Multi Core (Index Score, higher is better)  | 1630.7            | 1633.3                    | 0.16%           |
+
+### P550
+
+| 测试项目                                               | P550 rv64gc       | P550 rv64gc_zba_zbb | diff percentage |
+| ------------------------------------------------------ | ----------------- | ------------------- | --------------- |
+| Coremark (Score, higher is better)                     | 7412.898443       | 7904.570279         | 6.63%           |
+| Coremark Pro Single Core (Score, higher is better)     | 2339.70           | 2493.64             | 6.58%           |
+| Coremark Pro Multi Core (Score, higher is better)      | 8373.08           | 9043.05             | 8.00%           |
+| Unix Bench Single Core (Index Score, higher is better) | 474.9             | 475.3               | 0.08%           |
+| Unix Bench Multi Core (Index Score, higher is better)  | 1573.0            | 1571.2              | -0.11%          |
