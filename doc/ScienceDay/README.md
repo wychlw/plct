@@ -42,7 +42,7 @@
 
 编译见 [OpenMPI](./OpenMPI/README.md)
 
-Demo见 [LAMMPS](https://github.com/Arielfoever/Work-PLCT/tree/master/show)
+Demo见 [LAMMPS](https://github.com/Arielfoever/Work-PLCT/tree/master/show) [wiki](https://zh.wikipedia.org/wiki/LAMMPS)
 
 ~注：实际RV跑这玩意需要挺长时间，建议旁边视频~
 
