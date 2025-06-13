@@ -427,6 +427,19 @@ block size : single random read / dual random read, [MADV_HUGEPAGE]
   67108864 :  163.1 ns          /   190.0 ns 
 ```
 
+对比（RevyOS rv64gc）：
+```log
+ libc memcpy copy                                 :   4113.0 MB/s (4)
+ libc memchr scan                                 :   4016.3 MB/s (10, 0.3%)
+ libc memset fill                                 :   4895.6 MB/s (10, 0.2%)
+```
+对比（RevyOS rv64gc_xtheadba_xtheadbb_xtheadbs_xtheadvector）：
+```log
+ libc memcpy copy                                 :   4096.6 MB/s (10, 0.9%)
+ libc memchr scan                                 :   4007.8 MB/s (3)
+ libc memset fill                                 :   4890.7 MB/s (10, 0.2%)
+```
+
 #### ramlat
 
 ramlat是一个内存性能测试工具，主要用于测量内存的延迟。
