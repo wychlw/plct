@@ -360,12 +360,18 @@ block size : single random read / dual random read, [MADV_HUGEPAGE]
   67108864 :  163.1 ns          /   190.0 ns 
 ```
 
+对比（RevyOS rv64gc使用gcc-12）：
+```log
+
+```
+
 对比（RevyOS rv64gc）：
 ```log
  libc memcpy copy                                 :   4113.0 MB/s (4)
  libc memchr scan                                 :   4016.3 MB/s (10, 0.3%)
  libc memset fill                                 :   4895.6 MB/s (10, 0.2%)
 ```
+
 对比（RevyOS rv64gc_xtheadba_xtheadbb_xtheadbs_xtheadvector）：
 ```log
  libc memcpy copy                                 :   4096.6 MB/s (10, 0.9%)
