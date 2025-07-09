@@ -22,18 +22,17 @@ def get_last_ver():
     return '0.0.0'
 
 def get_current_ver():
-    mirror_base_url = 'https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/'
+    mirror_base_url = 'https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/'
     mirror_page = requests.get(mirror_base_url).text
     soup = bs4.BeautifulSoup(mirror_page, 'html.parser')
-    selector = '#list > tbody > tr > td.link > a'
+    selector = 'body > pre:nth-child(3) > a'
     links = soup.select(selector)
     ver_list = []
     for link in links:
         href = link.get('href')
         if '..' in href:
             continue
-        title = link.get('title')
-        ver_list.append(title)
+        ver_list.append(href[:-1])
 
     sort_ver(ver_list)
     return ver_list[-1]
@@ -51,9 +50,9 @@ license=('Apache-2.0')
 depends=('wget' 'git' 'tar' 'bzip2' 'xz' 'zstd')
 provides=('ruyi=$pkgver')
 options=('!strip') # !important, otherwise the binary will be broken
-source_x86_64=("ruyi-$pkgver-bin-x86_64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
-source_arm64=("ruyi-$pkgver-bin-arm64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
-source_riscv64=("ruyi-$pkgver-bin-riscv64::https://mirror.iscas.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.riscv64")
+source_x86_64=("ruyi-$pkgver-bin-x86_64::https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
+source_arm64=("ruyi-$pkgver-bin-arm64::https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
+source_riscv64=("ruyi-$pkgver-bin-riscv64::https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.riscv64")
 
 package() {
     install -d "${pkgdir}/usr/bin"
