@@ -49,6 +49,7 @@ url="https://github.com/ruyisdk/ruyi"
 license=('Apache-2.0')
 depends=('wget' 'git' 'tar' 'bzip2' 'xz' 'zstd')
 provides=('ruyi=$pkgver')
+conflicts=('ruyi')
 options=('!strip') # !important, otherwise the binary will be broken
 source_x86_64=("ruyi-$pkgver-bin-x86_64::https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.amd64")
 source_arm64=("ruyi-$pkgver-bin-arm64::https://fast-mirror.isrc.ac.cn/ruyisdk/ruyi/releases/$pkgver/ruyi.arm64")
